@@ -1,5 +1,5 @@
 # Potionscript
-  Potion 기본 강의 body { font-family: 'Arial', sans-serif; padding: 20px; } h1, h2 { color: #333; } pre { background-color: #f4f4f4; padding: 10px; border-radius: 5px; }
+  Potion 기본 강의
 
 Potion 언어 강의
 ============
