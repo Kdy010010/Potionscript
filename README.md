@@ -13,7 +13,7 @@ Potion 언어 강의
 --------------------
 
 웹 페이지에 "Potion" 스크립트를 추가하려면 다음과 같이 사용합니다:
-
+ <script src="potionmain.js"></script> <!-- 여기에 Potion 인터프리터의 경로를 넣으세요 -->
 <script type="text/potion">
   // Potion 코드
 </script>
