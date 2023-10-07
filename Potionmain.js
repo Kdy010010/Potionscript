@@ -2,15 +2,26 @@ function parseValue(value, variables) {
     if (value.startsWith('"') && value.endsWith('"')) {
         return value.slice(1, -1);
     }
-    if (variables[value]) {
+    if (variables.hasOwnProperty(value)) {  // Check if variable exists
         return variables[value];
     }
     return parseFloat(value);
 }
 
-function interpretPotion(code) {
+function importLibrary(url) {
+    // For the purpose of demonstration, we'll just log it.
+    console.log("Importing library from:", url);
+    // Actual implementation for importing a JS library would require more advanced techniques.
+}
+
+function getUserInput(message) {
+    // Using browser's prompt for demonstration purposes.
+    return prompt(message);
+}
+
+function interpretPotion(code, outerVariables = {}) {
     const lines = code.trim().split("\n");
-    let variables = {};
+    let variables = {...outerVariables};  // Copy variables from outer scope
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i].trim();
@@ -40,22 +51,25 @@ function interpretPotion(code) {
         } else if (line.startsWith("if")) {
             const condition = !!parseValue(line.split(" ")[1], variables);
             i++;
+            const innerCode = [];
             while (!lines[i].startsWith("end")) {
-                if (condition) {
-                    interpretPotion(lines[i]);
-                }
+                innerCode.push(lines[i]);
                 i++;
+            }
+            if (condition) {
+                interpretPotion(innerCode.join("\n"), variables);
             }
         } else if (line.startsWith("repeat")) {
             let times = parseValue(line.split(" ")[1], variables);
             i++;
             const start = i;
+            const innerCode = [];
+            while (!lines[i].startsWith("end")) {
+                innerCode.push(lines[i]);
+                i++;
+            }
             while (times-- > 0) {
-                while (!lines[i].startsWith("end")) {
-                    interpretPotion(lines[i]);
-                    i++;
-                }
-                i = start;
+                interpretPotion(innerCode.join("\n"), variables);
             }
         } else if (line.startsWith("getUserInput")) {
             const message = line.split('"')[1];
@@ -72,3 +86,4 @@ window.onload = function() {
         interpretPotion(potion.textContent);
     }
 };
+
