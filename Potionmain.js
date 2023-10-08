@@ -2,33 +2,36 @@ function parseValue(value, variables) {
     if (value.startsWith('"') && value.endsWith('"')) {
         return value.slice(1, -1);
     }
-    if (variables.hasOwnProperty(value)) {  // Check if variable exists
+    if (variables.hasOwnProperty(value)) {
         return variables[value];
     }
     return parseFloat(value);
 }
 
 function importLibrary(url) {
-    // For the purpose of demonstration, we'll just log it.
-    console.log("Importing library from:", url);
-    // Actual implementation for importing a JS library would require more advanced techniques.
+    return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = url;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
 }
 
 function getUserInput(message) {
-    // Using browser's prompt for demonstration purposes.
     return prompt(message);
 }
 
-function interpretPotion(code, outerVariables = {}) {
+async function interpretPotion(code, outerVariables = {}) {
     const lines = code.trim().split("\n");
-    let variables = {...outerVariables};  // Copy variables from outer scope
+    let variables = {...outerVariables};
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i].trim();
 
         if (line.startsWith("import")) {
             const url = line.split('"')[1];
-            importLibrary(url);
+            await importLibrary(url);
         } else if (line.startsWith("store")) {
             const parts = line.split(" ");
             const varName = parts[1];
@@ -57,19 +60,18 @@ function interpretPotion(code, outerVariables = {}) {
                 i++;
             }
             if (condition) {
-                interpretPotion(innerCode.join("\n"), variables);
+                await interpretPotion(innerCode.join("\n"), variables);
             }
         } else if (line.startsWith("repeat")) {
             let times = parseValue(line.split(" ")[1], variables);
             i++;
-            const start = i;
             const innerCode = [];
             while (!lines[i].startsWith("end")) {
                 innerCode.push(lines[i]);
                 i++;
             }
             while (times-- > 0) {
-                interpretPotion(innerCode.join("\n"), variables);
+                await interpretPotion(innerCode.join("\n"), variables);
             }
         } else if (line.startsWith("getUserInput")) {
             const message = line.split('"')[1];
@@ -80,10 +82,9 @@ function interpretPotion(code, outerVariables = {}) {
     }
 }
 
-window.onload = function() {
+window.onload = async function() {
     let potions = document.querySelectorAll('script[type="text/potion"]');
     for (let potion of potions) {
-        interpretPotion(potion.textContent);
+        await interpretPotion(potion.textContent);
     }
 };
-
