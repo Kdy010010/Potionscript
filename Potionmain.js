@@ -8,23 +8,23 @@ function parseValue(value, variables) {
     return parseFloat(value);
 }
 
-function importLibrary(url) {
-    return new Promise((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src = url;
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
-    });
-}
-
-function getUserInput(message) {
-    return prompt(message);
-}
-
 async function interpretPotion(code, outerVariables = {}) {
     const lines = code.trim().split("\n");
     let variables = {...outerVariables};
+
+    function importLibrary(url) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = url;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+    }
+
+    function getUserInput(message) {
+        return prompt(message);
+    }
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i].trim();
