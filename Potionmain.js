@@ -76,6 +76,13 @@ async function interpretPotion(code, outerVariables = {}) {
         } else if (line.startsWith("getUserInput")) {
             const message = line.split('"')[1];
             variables['_'] = getUserInput(message);
+        } else if (line.startsWith("invoke")) {
+            const parts = line.split(" ");
+            const objectMethod = parts[1].split('.');
+            const objectName = objectMethod[0];
+            const methodName = objectMethod[1];
+            const argument = parseValue(parts[2], variables);
+            window[objectName][methodName](argument);
         } else if (line === "exit") {
             return;
         }
